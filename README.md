@@ -1,4 +1,4 @@
-# Brofessor
+# QuidProKnow
 
 A peer-to-peer skill-exchange platform. List skills you can teach and skills you want to learn, get matched with compatible users, schedule a session with a video-call link, chat in real time, and rate each other afterward. Profiles can also be run through an AI-powered analyzer for a completeness score and personalized feedback.
 
@@ -44,13 +44,14 @@ A peer-to-peer skill-exchange platform. List skills you can teach and skills you
 
 **AI**
 - Groq API — `llama-3.3-70b-versatile`
+- Gemini API (Optional alternative)
 
 ---
 
 ## Project Structure
 
 ```
-brofessor-chat/
+QuidProKnow/
 ├── backend/
 │   └── src/main/java/com/skillify/
 │       ├── entity/          User, UserSkill, Session, SkillRequest, Notification, enums
@@ -91,8 +92,8 @@ brofessor-chat/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/Samidhajoshi/BroFessor.git
-cd BroFessor
+git clone https://github.com/SachinPundir78/Prototype-.git
+cd Prototype-
 ```
 
 ### 2. Backend
@@ -101,16 +102,18 @@ The backend reads all secrets from environment variables, with safe local defaul
 
 | Variable | Default (local) | Required in production? |
 |---|---|---|
-| `DB_URL` | `jdbc:mysql://localhost:3306/brofessor?...` | Yes |
+| `DB_URL` | `jdbc:mysql://localhost:3306/quidproknow?...` | Yes |
 | `DB_USERNAME` | `root` | Yes |
 | `DB_PASSWORD` | *(empty)* | Yes |
 | `JWT_SECRET` | dev placeholder (32+ bytes) |Yes|
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Yes |
-| `GROQ_API_KEY` | *(none)* | Yes, for the AI analyzer |
+| `GROQ_API_KEY` | *(none)* | Yes, for the AI analyzer (or use GEMINI_API_KEY) |
+| `GEMINI_API_KEY` | *(none)* | Optional alternative to Groq |
+| `RESEND_API_KEY` | *(none)* | Yes, for contact form emails |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | *(none)* | Yes, for photo uploads |
 | `PORT` | `8080` | No |
 
-MySQL will auto-create the `brofessor` database on first run (`createDatabaseIfNotExist=true`), and Hibernate will create/update tables (`spring.jpa.hibernate.ddl-auto=update`).
+MySQL will auto-create the `QuidProKnow` database on first run (`createDatabaseIfNotExist=true`), and Hibernate will create/update tables (`spring.jpa.hibernate.ddl-auto=update`).
 
 **Set the Groq key** (Windows / PowerShell, permanent for your user):
 
@@ -194,6 +197,4 @@ npm run preview   # to preview the production build locally
 All routes except `/api/auth/**`, `/ws/**`, and `/error` require a `Authorization: Bearer <jwt>` header.
 
 ---
-
-Try at : https://bro-fessor.vercel.app/
 
