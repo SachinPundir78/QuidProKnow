@@ -33,6 +33,9 @@ public class AuthController {
     }
 
     private String extractClerkId(org.springframework.security.core.Authentication auth) {
+        if (auth == null) {
+            throw new com.skillify.exception.ApiException("Unauthorized: Missing security token", org.springframework.http.HttpStatus.UNAUTHORIZED);
+        }
         if (auth instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken jwtAuth) {
             return jwtAuth.getToken().getSubject();
         } else if (auth.getPrincipal() instanceof com.skillify.security.UserPrincipal userPrincipal) {
