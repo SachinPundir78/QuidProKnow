@@ -25,17 +25,20 @@ A peer-to-peer skill-exchange platform. List skills you can teach and skills you
 
 ## Screenshots
 
-![Screenshot 1](./frontend/src/public/S1.png)
-
-![Screenshot 2](./frontend/src/public/S2.png)
-
-![Screenshot 3](./frontend/src/public/S3.png)
-
-![Screenshot 4](./frontend/src/public/S4.png)
-
-![Screenshot 5](./frontend/src/public/S5.png)
-
-![Screenshot 6](./frontend/src/public/S6.png)
+<div align="center">
+  <table>
+    <tr>
+      <td width="33%"><img src="./frontend/src/public/S1.png" alt="Landing Page" /></td>
+      <td width="33%"><img src="./frontend/src/public/S2.png" alt="Dashboard" /></td>
+      <td width="33%"><img src="./frontend/src/public/S3.png" alt="Browse Users" /></td>
+    </tr>
+    <tr>
+      <td width="33%"><img src="./frontend/src/public/S4.png" alt="Sessions & Calendar" /></td>
+      <td width="33%"><img src="./frontend/src/public/S5.png" alt="Real-time Chat" /></td>
+      <td width="33%"><img src="./frontend/src/public/S6.png" alt="AI Profile Analyzer" /></td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -43,32 +46,36 @@ A peer-to-peer skill-exchange platform. List skills you can teach and skills you
 
 **Backend**
 - Java 21+, Spring Boot 3.2
-- Spring Security + JWT (`jjwt`)
+- Spring Security + OAuth2 JWT (Clerk IdP)
 - Spring Data JPA / Hibernate
-- MySQL
+- PostgreSQL (Hosted on Neon)
 - Spring WebSocket (STOMP over SockJS)
-- Spring Scheduler
+- Spring Scheduler (Email & Notification Engine)
 - Cloudinary (profile photo storage)
-- Lombok
-- Maven
+- Lombok, Maven
 
 **Frontend**
 - React 18 + Vite 5
+- TailwindCSS
 - React Router
-- Axios
+- Axios (with Clerk JWT interceptor)
 - `@stomp/stompjs` + `sockjs-client`
 
-**AI**
-- Groq API — `llama-3.3-70b-versatile`
-- Gemini API (Optional alternative)
+**AI & Email Services**
+- Groq API — `llama-3.3-70b-versatile` / Gemini API
+- Gmail SMTP / Resend API
 
 ---
 
 ## System Design
 
+> 🔗 **Interactive Diagrams**: [View Full Architecture Workspace on Eraser.io](https://app.eraser.io/workspace/5Zqsighpz7jUk1cPJm1R?origin=share&elements=TqvV97pKoxPW7sDMlQ_x8A)
+
 ### High Level Design (HLD)
 
 QuidProKnow is built with a modern client-server architecture, decoupling the React presentation layer from the Spring Boot business logic layer.
+
+![High Level Design Diagram](./frontend/src/public/HLD.png)
 
 ```mermaid
 flowchart TD
@@ -117,6 +124,8 @@ flowchart TD
 ---
 
 ### Low Level Design (LLD)
+
+![Low Level Design Diagram](./frontend/src/public/LLD.png)
 
 #### 1. Entity-Relationship & Database Schema (PostgreSQL)
 
