@@ -38,12 +38,14 @@ function AppSidebar({ unreadChat, pendingRequests, isDarkMode, menuItems, isLink
       <SidebarHeader className="p-6">
         {/* Logo */}
         <div>
-          <a href="/" className="flex items-center gap-2">
+          <Link
+            to="/"
+            onClick={() => isMobile && setOpenMobile(false)} className="flex items-center gap-2">
             <Handshake className="w-6 h-6 text-give" />
             <span className={`font-logo font-bold text-xl tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               Quid<span className="text-give italic font-extrabold">Pro</span>Know
             </span>
-          </a>
+          </Link>
         </div>
 
         {/* Back to Home Button */}
