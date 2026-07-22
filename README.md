@@ -28,14 +28,16 @@ A peer-to-peer skill-exchange platform. List skills you can teach and skills you
 <div align="center">
   <table>
     <tr>
-      <td width="33%"><img src="./frontend/src/public/S1.png" alt="Landing Page" /></td>
-      <td width="33%"><img src="./frontend/src/public/S2.png" alt="Dashboard" /></td>
-      <td width="33%"><img src="./frontend/src/public/S3.png" alt="Browse Users" /></td>
+      <td width="50%"><img src="./frontend/src/public/S1.png" alt="Landing Page" /></td>
+      <td width="50%"><img src="./frontend/src/public/S2.png" alt="Landing Page2" /></td>
+    </tr>
+     <tr>
+       <td width="50%"><img src="./frontend/src/public/S3.png" alt="Dashboard" /></td>
+      <td width="50%"><img src="./frontend/src/public/S4.png" alt="Dashboard2" /></td>
     </tr>
     <tr>
-      <td width="33%"><img src="./frontend/src/public/S4.png" alt="Sessions & Calendar" /></td>
-      <td width="33%"><img src="./frontend/src/public/S5.png" alt="Real-time Chat" /></td>
-      <td width="33%"><img src="./frontend/src/public/S6.png" alt="AI Profile Analyzer" /></td>
+       <td width="50%"><img src="./frontend/src/public/S5.png" alt="Chat" /></td>
+      <td width="50%"><img src="./frontend/src/public/S6.png" alt="Chat2" /></td>
     </tr>
   </table>
 </div>
