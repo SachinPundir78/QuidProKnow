@@ -29,8 +29,8 @@ export default function Contact() {
     <>
       <Navbar />
       <div className="pt-12 min-h-screen flex flex-col justify-between font-body">
-        <main className="flex-grow container mx-auto px-6 py-12 md:py-16 max-w-5xl">
-          <div className="text-center mb-12">
+        <main className="flex-grow container mx-auto px-6 py-12  max-w-5xl">
+          <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-give/50"></div>
               <span className="font-logo italic text-give text-2xl font-bold tracking-wide">
@@ -48,10 +48,10 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mt-4">
             {/* Info panel */}
             <div className="md:col-span-5 bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-gray-200 dark:border-white/10 p-8 rounded-2xl shadow-sm space-y-6">
-              <h2 className="text-2xl font-bold font-display text-gray-900 dark:!text-white mb-4">
+              <h2 className="text-2xl !font-semibold font-display text-gray-900 dark:!text-white mb-4">
                 Contact Information
               </h2>
 

@@ -18,14 +18,31 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest req) {
-        return ResponseEntity.ok(authService.register(req));
+    @PostMapping("/sync")
+    public ResponseEntity<UserDTO> syncUser(
+            @Valid @RequestBody RegisterRequest req,
+            org.springframework.security.core.Authentication auth) {
+        return ResponseEntity.ok(authService.syncClerkUser(req, extractClerkId(auth)));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
-        return ResponseEntity.ok(authService.login(req));
+    @PutMapping("/onboard")
+    public ResponseEntity<UserDTO> onboardUser(
+            @Valid @RequestBody com.skillify.dto.OnboardingRequest req,
+            org.springframework.security.core.Authentication auth) {
+        return ResponseEntity.ok(authService.onboardUser(req, extractClerkId(auth)));
+    }
+
+    private String extractClerkId(org.springframework.security.core.Authentication auth) {
+        if (auth instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken jwtAuth) {
+            return jwtAuth.getToken().getSubject();
+        } else if (auth.getPrincipal() instanceof com.skillify.security.UserPrincipal userPrincipal) {
+            return userPrincipal.getUser().getClerkId();
+        } else if (auth.getCredentials() instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
+            return jwt.getSubject();
+        } else if (auth.getPrincipal() instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
+            return jwt.getSubject();
+        }
+        throw new com.skillify.exception.ApiException("Unauthorized or invalid token type", org.springframework.http.HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/profile")

@@ -6,6 +6,7 @@ import NotificationBell from './NotificationBell';
 import { chatService } from '../api/chatService';
 import { Handshake, LogOut, Sun, Moon, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { UserButton } from '@clerk/clerk-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -83,10 +84,9 @@ export default function Navbar() {
           {user ? (
             <>
               <NotificationBell />
-              <Button variant="outline" className="hidden sm:flex gap-1.5" onClick={handleLogout}>
-                <LogOut className="w-4 h-4" />
-                <span>Log out</span>
-              </Button>
+              <div className="hidden sm:flex items-center">
+                <UserButton afterSignOutUrl="/" />
+              </div>
             </>
           ) : (
             <div className="hidden sm:flex items-center gap-3">
@@ -146,11 +146,8 @@ export default function Navbar() {
               </div>
             )}
             {user && (
-              <div className="flex sm:hidden flex-col gap-3">
-                <Button variant="outline" className="w-full gap-1.5" onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}>
-                  <LogOut className="w-4 h-4" />
-                  <span>Log out</span>
-                </Button>
+              <div className="flex sm:hidden flex-col gap-3 items-center">
+                <UserButton afterSignOutUrl="/" />
               </div>
             )}
           </div>

@@ -1,65 +1,83 @@
-import { createContext, useContext, useState, useCallback } from 'react';
-import { authService } from '../api/authService';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useUser, useAuth as useClerkAuth, useClerk } from '@clerk/clerk-react';
+import axiosClient from '../api/axiosClient';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('quidproknow_user');
-    if (!stored || stored === 'undefined' || stored === 'null') return null;
+  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
+
+  const [localUser, setLocalUser] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  
+  // This function syncs the Clerk user to our backend and gets the full profile
+  const refreshUser = useCallback(async () => {
+    if (!isSignedIn || !clerkUser) return null;
+    setIsSyncing(true);
     try {
-      return JSON.parse(stored);
-    } catch {
-      localStorage.removeItem('quidproknow_user');
+      const response = await axiosClient.post('/auth/sync', {
+        name: clerkUser.fullName || clerkUser.username || "Anonymous",
+        email: clerkUser.primaryEmailAddress?.emailAddress || "",
+        age: 0,
+        userType: "LEARNER",
+        skillsWanted: ["General"],
+        skillsOffered: []
+      });
+      setLocalUser(response.data);
+      return response.data;
+    } catch (e) {
+      console.error("Failed to sync user with backend", e);
       return null;
+    } finally {
+      setIsSyncing(false);
     }
-  });
-  const [token, setToken] = useState(() => localStorage.getItem('quidproknow_token'));
+  }, [isSignedIn, clerkUser]);
 
-  const persist = (newToken, newUser) => {
-    localStorage.setItem('quidproknow_token', newToken);
-    localStorage.setItem('quidproknow_user', JSON.stringify(newUser));
-    setToken(newToken);
-    setUser(newUser);
-  };
-
-  const login = useCallback(async (email, password) => {
-    const data = await authService.login({ email, password });
-    persist(data.token, data.user);
-    return data.user;
-  }, []);
-
-  const register = useCallback(async (payload) => {
-    const data = await authService.register(payload);
-    persist(data.token, data.user);
-    return data.user;
-  }, []);
+  useEffect(() => {
+    if (isSignedIn && clerkUser && !localUser) {
+      refreshUser();
+    } else if (!isSignedIn) {
+      setLocalUser(null);
+    }
+  }, [isSignedIn, clerkUser, localUser, refreshUser]);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('quidproknow_token');
-    localStorage.removeItem('quidproknow_user');
-    setToken(null);
-    setUser(null);
-  }, []);
-
-  const refreshUser = useCallback(async () => {
-    const fresh = await authService.profile();
-    localStorage.setItem('quidproknow_user', JSON.stringify(fresh));
-    setUser(fresh);
-    return fresh;
-  }, []);
+    signOut();
+    setLocalUser(null);
+  }, [signOut]);
 
   const updateLocalUser = useCallback((partialUser) => {
-    setUser((prev) => {
-      const merged = { ...prev, ...partialUser };
-      localStorage.setItem('quidproknow_user', JSON.stringify(merged));
-      return merged;
-    });
+    setLocalUser((prev) => ({ ...prev, ...partialUser }));
   }, []);
+
+  const onboardUser = useCallback(async (onboardingData) => {
+    setIsSyncing(true);
+    try {
+      const response = await axiosClient.put('/auth/onboard', onboardingData);
+      setLocalUser(response.data);
+      return response.data;
+    } catch (e) {
+      console.error("Failed to onboard user", e);
+      throw e;
+    } finally {
+      setIsSyncing(false);
+    }
+  }, []);
+
+  const token = isSignedIn ? "clerk-token-active" : null;
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#fff7ed]">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider
-      value={{ user, token, login, register, logout, refreshUser, updateLocalUser }}
+      value={{ user: localUser, token, isSyncing, logout, refreshUser, updateLocalUser, onboardUser }}
     >
       {children}
     </AuthContext.Provider>

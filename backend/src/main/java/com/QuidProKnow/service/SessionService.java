@@ -242,17 +242,30 @@ public class SessionService {
             teacher = userRepository.findById(teacher.getId())
                     .orElseThrow(() -> new ApiException("Teacher not found.", HttpStatus.NOT_FOUND));
             teacher.setPoints(teacher.getPoints() + 25);
+            teacher.setSessionsCompleted(teacher.getSessionsCompleted() + 1);
             userRepository.save(teacher);
             notificationService.notify(teacher,
                     "Session completed! You earned 25 points for teaching \"" + session.getSkill() + "\". Total: " + teacher.getPoints());
             // Notify learner too if they aren't the one who triggered this
+            learner = userRepository.findById(learner.getId())
+                    .orElseThrow(() -> new ApiException("Learner not found.", HttpStatus.NOT_FOUND));
+            learner.setSessionsCompleted(learner.getSessionsCompleted() + 1);
+            userRepository.save(learner);
+            
             if (imUser1) {
                 notificationService.notify(me,
                         "Session completed! You have learned " + session.getSkill() + ".");
             }
         } else {
             me.setPoints(me.getPoints() + 10);
+            me.setSessionsCompleted(me.getSessionsCompleted() + 1);
             userRepository.save(me);
+            
+            User partner = imUser1 ? session.getUser2() : session.getUser1();
+            partner = userRepository.findById(partner.getId())
+                    .orElseThrow(() -> new ApiException("Partner not found.", HttpStatus.NOT_FOUND));
+            partner.setSessionsCompleted(partner.getSessionsCompleted() + 1);
+            userRepository.save(partner);
             notificationService.notify(me,
                     "Barter session completed! You earned 10 points. Total: " + me.getPoints());
         }

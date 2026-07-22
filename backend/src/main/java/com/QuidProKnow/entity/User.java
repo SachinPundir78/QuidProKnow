@@ -20,13 +20,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String clerkId;
+
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     @Builder.Default
@@ -51,7 +53,15 @@ public class User {
     private int totalRatings = 0;
 
     @Builder.Default
+    @Column(columnDefinition = "integer default 0")
+    private int sessionsCompleted = 0;
+
+    @Builder.Default
     private String badge = "NONE";
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean onboarded = false;
 
     // ── Social & learning links ───────────────────────────────────────────
     @Column(name = "github_url", length = 300)

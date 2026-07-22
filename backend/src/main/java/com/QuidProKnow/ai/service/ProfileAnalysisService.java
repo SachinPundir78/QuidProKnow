@@ -65,9 +65,9 @@ public class ProfileAnalysisService {
         ProfileAnalysis analysis = ProfileAnalysis.builder()
                 .userId(userId)
                 .profileScore(result.score())
-                .strengths(toJson(result.strengths()))
-                .weaknesses(toJson(result.weaknesses()))
-                .suggestions(toJson(result.suggestions()))
+                .strengths(result.strengths())
+                .weaknesses(result.weaknesses())
+                .suggestions(result.suggestions())
                 .aiFeedback(aiFeedback)
                 .profileHash(currentHash)
                 .build();
@@ -97,25 +97,16 @@ public class ProfileAnalysisService {
         return ProfileAnalysisResponse.builder()
                 .id(a.getId())
                 .profileScore(a.getProfileScore())
-                .strengths(fromJson(a.getStrengths()))
-                .weaknesses(fromJson(a.getWeaknesses()))
-                .suggestions(fromJson(a.getSuggestions()))
+                .strengths(a.getStrengths() != null ? a.getStrengths() : List.of())
+                .weaknesses(a.getWeaknesses() != null ? a.getWeaknesses() : List.of())
+                .suggestions(a.getSuggestions() != null ? a.getSuggestions() : List.of())
                 .aiFeedback(a.getAiFeedback())
                 .createdAt(a.getCreatedAt())
                 .cached(cached)
                 .build();
     }
 
-    private String toJson(List<String> list) {
-        try { return objectMapper.writeValueAsString(list); }
-        catch (Exception e) { return "[]"; }
-    }
 
-    private List<String> fromJson(String json) {
-        if (json == null) return List.of();
-        try { return objectMapper.readValue(json, new TypeReference<>() {}); }
-        catch (Exception e) { return List.of(); }
-    }
 
     /**
      * SHA-256 of the profile fields that affect scoring.

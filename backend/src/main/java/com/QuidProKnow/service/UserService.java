@@ -9,7 +9,6 @@ import com.skillify.repository.UserRepository;
 import com.skillify.repository.UserSkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +24,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserSkillRepository userSkillRepository;
-    private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
     private final Cloudinary cloudinary;
 
@@ -69,9 +67,7 @@ public class UserService {
 
         user.setName(req.getName());
         user.setEmail(req.getEmail());
-        if (req.getPassword() != null && !req.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(req.getPassword()));
-        }
+        // Password is now handled by Clerk
         user.setAge(req.getAge());
         user.setBio(req.getBio());
         user.setGithubUrl(sanitizeUrl(req.getGithubUrl()));

@@ -40,7 +40,8 @@ export default function Chat() {
         if (mounted) setOnlineUsers(new Set(onlineIds));
 
         // Connect WebSocket
-        await connect(token);
+        const realToken = await window.Clerk.session.getToken();
+        await connect(realToken);
         if (!mounted) return;
 
         setWsReady(true);

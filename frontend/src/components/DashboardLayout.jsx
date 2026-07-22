@@ -7,6 +7,7 @@ import { requestService } from '../api/requestService';
 import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
 import NotificationBell from './NotificationBell';
 import { TooltipProvider } from './ui/tooltip';
+import { UserButton } from '@clerk/clerk-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -36,11 +37,13 @@ function AppSidebar({ unreadChat, pendingRequests, isDarkMode, menuItems, isLink
     <Sidebar className="border-r border-white/60 bg-white/70 dark:border-zinc-800/50 dark:bg-zinc-950 backdrop-blur-md">
       <SidebarHeader className="p-6">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <Handshake className="w-6 h-6 text-give" />
-          <span className={`font-logo font-bold text-xl tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            Quid<span className="text-give italic font-extrabold">Pro</span>Know
-          </span>
+        <div>
+          <a href="/" className="flex items-center gap-2">
+            <Handshake className="w-6 h-6 text-give" />
+            <span className={`font-logo font-bold text-xl tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Quid<span className="text-give italic font-extrabold">Pro</span>Know
+            </span>
+          </a>
         </div>
 
         {/* Back to Home Button */}
@@ -63,14 +66,13 @@ function AppSidebar({ unreadChat, pendingRequests, isDarkMode, menuItems, isLink
               <SidebarMenuItem key={item.to} className="my-0.5">
                 <SidebarMenuButton
                   isActive={active}
-                  asChild
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${active
                     ? 'bg-give-bg/70 dark:bg-give/10 text-black dark:text-white font-semibold shadow-sm'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-black dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-white'
                     }`}
                 >
-                  <Link 
-                    to={item.to} 
+                  <Link
+                    to={item.to}
                     onClick={() => isMobile && setOpenMobile(false)}
                     className="flex items-center justify-between w-full"
                   >
@@ -95,7 +97,7 @@ function AppSidebar({ unreadChat, pendingRequests, isDarkMode, menuItems, isLink
         {/* AI Analyzer promo card */}
         <div className="bg-gradient-to-br from-gray-50 to-gray-200 dark:from-zinc-900/50 dark:to-zinc-900/30 border border-orange-100/50 dark:border-zinc-800/80 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-give animate-pulse" />
+            <Sparkles className="w-4 h-4 text-give animate-pulse" />
             <span className="text-xs font-display font-bold uppercase tracking-wider text-give">AI Analyzer</span>
           </div>
           <p className="text-xs !font-display text-gray-500 dark:text-zinc-400 leading-relaxed mb-3">
@@ -104,7 +106,7 @@ function AppSidebar({ unreadChat, pendingRequests, isDarkMode, menuItems, isLink
           <Link
             to="/profile-analyzer"
             onClick={() => isMobile && setOpenMobile(false)}
-             className="inline-flex  items-center justify-center font-display w-full py-1.5 bg-white dark:bg-zinc-800 border border-orange-200 dark:border-zinc-700 hover:bg-orange-50 dark:hover:bg-zinc-700/80 !text-black dark:!text-white text-xs font-bold rounded-lg transition-all"
+            className="inline-flex  items-center justify-center font-display w-full py-1.5 bg-white dark:bg-zinc-800 border border-orange-200 dark:border-zinc-700 hover:bg-orange-50 dark:hover:bg-zinc-700/80 !text-black dark:!text-white text-xs font-bold rounded-lg transition-all"
           >
             Try AI Analyzer &rarr;
           </Link>
@@ -196,12 +198,12 @@ export default function DashboardLayout({ children }) {
           />}
 
           {/* App Sidebar Component */}
-          <AppSidebar 
-            unreadChat={unreadChat} 
-            pendingRequests={pendingRequests} 
+          <AppSidebar
+            unreadChat={unreadChat}
+            pendingRequests={pendingRequests}
             isDarkMode={isDarkMode}
-            menuItems={menuItems} 
-            isLinkActive={isLinkActive} 
+            menuItems={menuItems}
+            isLinkActive={isLinkActive}
           />
 
           {/* Sidebar Inset (Main Area) */}
@@ -225,55 +227,8 @@ export default function DashboardLayout({ children }) {
                 <NotificationBell />
 
                 {/* Profile Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-gray-100/80 dark:hover:bg-zinc-900/80 text-left transition-all"
-                  >
-                    {userPhoto ? (
-                      <img
-                        src={userPhoto}
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover border border-orange-200 dark:border-zinc-800"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-give/10 text-give font-bold flex items-center justify-center text-xs">
-                        {user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="hidden xl:block">
-                      <p className="text-xs font-bold text-gray-900 dark:text-white leading-tight">
-                        {user.name}
-                      </p>
-                      <p className="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">
-                        {user.badge || 'Explorer'}
-                      </p>
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  </button>
-
-                  {showProfileMenu && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
-                      <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800/80 py-2 shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                        <Link
-                          to="/profile"
-                          onClick={() => setShowProfileMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                        >
-                          <User className="w-4 h-4 text-gray-400" />
-                          <span>My Profile</span>
-                        </Link>
-                        <button
-                          onClick={() => { setShowProfileMenu(false); handleLogout(); }}
-                          className="flex items-center gap-2.5 w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Log Out</span>
-                        </button>
-                      </div>
-                    </>
-                  )}
+                <div className="flex items-center">
+                  <UserButton afterSignOutUrl="/" />
                 </div>
               </div>
             </header>

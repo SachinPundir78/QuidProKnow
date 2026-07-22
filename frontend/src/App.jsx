@@ -5,8 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import DashboardLayout from './components/DashboardLayout';
 
-import Login from './pages/Login';
-import Register from './pages/Register';
+import { SignIn, SignUp } from '@clerk/clerk-react';
 import Dashboard from './pages/Dashboard';
 import BrowseUsers from './pages/BrowseUsers';
 import Requests from './pages/Requests';
@@ -20,6 +19,7 @@ import ProfileAnalyzer from './pages/ProfileAnalyzer';
 import Landing from './pages/Landing';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Onboarding from './pages/Onboarding';
 
 function RedirectIfAuthed({ children }) {
   const { token } = useAuth();
@@ -103,8 +103,23 @@ export default function App() {
               <Route path="/contact" element={<Contact />} />
 
               {/* Auth Routes */}
-              <Route path="/login" element={<RedirectIfAuthed><Login /></RedirectIfAuthed>} />
-              <Route path="/register" element={<RedirectIfAuthed><Register /></RedirectIfAuthed>} />
+              <Route path="/login" element={
+                <div className="flex h-screen w-full items-center justify-center bg-[#fff7ed]">
+                  <SignIn routing="path" path="/login" signUpUrl="/register" />
+                </div>
+              } />
+              <Route path="/register" element={
+                <div className="flex h-screen w-full items-center justify-center bg-[#fff7ed]">
+                  <SignUp routing="path" path="/register" signInUrl="/login" />
+                </div>
+              } />
+
+              {/* Onboarding */}
+              <Route path="/onboarding" element={
+                <ProtectedRoute allowUnonboarded={true}>
+                  <Onboarding />
+                </ProtectedRoute>
+              } />
 
               <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
               <Route path="/browse" element={<Protected><BrowseUsers /></Protected>} />

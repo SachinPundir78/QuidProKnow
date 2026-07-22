@@ -20,7 +20,9 @@ public class UserDTO {
     private int points;
     private double averageRating;
     private int totalRatings;
+    private int sessionsCompleted;
     private String badge;
+    private boolean onboarded;
     private List<UserSkillDTO> skills;
 
     // ── Social & learning links ───────────────────────────────────────────
@@ -44,7 +46,9 @@ public class UserDTO {
                 .points(u.getPoints())
                 .averageRating(u.getAverageRating())
                 .totalRatings(u.getTotalRatings())
+                .sessionsCompleted(u.getSessionsCompleted())
                 .badge(u.getBadge())
+                .onboarded(u.isOnboarded())
                 .skills(u.getSkills().stream().map(UserSkillDTO::from).collect(Collectors.toList()))
                 .githubUrl(u.getGithubUrl())
                 .linkedinUrl(u.getLinkedinUrl())

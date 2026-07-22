@@ -3,9 +3,12 @@ package com.skillify.ai.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "profile_analysis")
@@ -26,14 +29,17 @@ public class ProfileAnalysis {
     @Column(name = "profile_score", nullable = false)
     private int profileScore;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "JSON")
-    private String strengths;
+    private List<String> strengths;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "JSON")
-    private String weaknesses;
+    private List<String> weaknesses;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "JSON")
-    private String suggestions;
+    private List<String> suggestions;
 
     @Column(name = "ai_feedback", columnDefinition = "TEXT")
     private String aiFeedback;

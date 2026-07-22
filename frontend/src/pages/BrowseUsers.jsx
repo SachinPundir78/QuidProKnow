@@ -12,20 +12,20 @@ export default function BrowseUsers() {
   // Search mode: 'skill' or 'name'
   const [searchMode, setSearchMode] = useState('skill');
   const [skillQuery, setSkillQuery] = useState('');
-  const [nameQuery,  setNameQuery]  = useState('');
+  const [nameQuery, setNameQuery] = useState('');
 
-  const [results,  setResults]  = useState([]);
+  const [results, setResults] = useState([]);
   const [searched, setSearched] = useState(false);
-  const [loading,  setLoading]  = useState(false);
+  const [loading, setLoading] = useState(false);
   const [searchErr, setSearchErr] = useState('');
   const searchRequestId = useRef(0);
 
   // Request modal state
   const [requestTarget, setRequestTarget] = useState(null);
-  const [comment,       setComment]       = useState('');
-  const [requestSkill,  setRequestSkill]  = useState('');
-  const [sending,       setSending]       = useState(false);
-  const [feedback,      setFeedback]      = useState('');
+  const [comment, setComment] = useState('');
+  const [requestSkill, setRequestSkill] = useState('');
+  const [sending, setSending] = useState(false);
+  const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
     const query = (searchMode === 'skill' ? skillQuery : nameQuery).trim();
@@ -92,7 +92,7 @@ export default function BrowseUsers() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 font-display">
+    <div className="max-w-6xl mx-auto px-4 py-4 font-display">
       <div className="mb-8 pb-6 border-b border-gray-200/70 dark:border-zinc-800/70">
         <h1 className="font-display font-bold text-3xl text-gray-900 dark:text-white">Browse users</h1>
         <p className="text-md font-normal text-gray-500 dark:text-zinc-400 mt-1">Search by skill to find a teacher, or by name to find someone specific.</p>
@@ -100,24 +100,22 @@ export default function BrowseUsers() {
 
       {/* Search mode tabs */}
       <div className="flex border-b border-gray-200/70 dark:border-zinc-800/70 mb-6">
-        <button 
+        <button
           onClick={() => { setSearchMode('skill'); setResults([]); setSearched(false); }}
-          className={`px-5 py-3 border-b-2 font-medium text-sm transition-all flex items-center gap-2 ${
-            searchMode === 'skill' 
-              ? 'border-give text-give font-bold' 
+          className={`px-5 py-3 border-b-2 font-medium text-sm transition-all flex items-center gap-2 ${searchMode === 'skill'
+              ? 'border-give text-give font-bold'
               : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-give hover:border-gray-300 dark:hover:border-zinc-700'
-          }`}
+            }`}
         >
           <Target className="w-4 h-4" />
           <span>Search by skill</span>
         </button>
-        <button 
+        <button
           onClick={() => { setSearchMode('name'); setResults([]); setSearched(false); }}
-          className={`px-5 py-3 border-b-2 font-medium text-sm transition-all flex items-center gap-2 ${
-            searchMode === 'name' 
-              ? 'border-give text-give font-bold' 
+          className={`px-5 py-3 border-b-2 font-medium text-sm transition-all flex items-center gap-2 ${searchMode === 'name'
+              ? 'border-give text-give font-bold'
               : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-give hover:border-gray-300 dark:hover:border-zinc-700'
-          }`}
+            }`}
         >
           <Search className="w-4 h-4" />
           <span>Search by name</span>
@@ -129,28 +127,28 @@ export default function BrowseUsers() {
         {searchMode === 'skill' ? (
           <div className="flex flex-col gap-1.5 flex-1">
             <label htmlFor="skillWanted" className="text-xs font-semibold text-gray-600 dark:text-zinc-300">Skill to learn</label>
-            <input 
-              id="skillWanted" 
+            <input
+              id="skillWanted"
               value={skillQuery}
               onChange={e => setSkillQuery(e.target.value)}
-              placeholder="e.g. Photoshop, Spanish, Guitar…" 
+              placeholder="e.g. Photoshop, Spanish, Guitar…"
               className="px-3.5 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-give focus:ring-4 focus:ring-give/5 transition-all text-sm bg-gray-50 dark:bg-zinc-950/45 dark:text-white dark:placeholder:text-zinc-500"
             />
           </div>
         ) : (
           <div className="flex flex-col gap-1.5 flex-1">
             <label htmlFor="nameQuery" className="text-xs font-semibold text-gray-600 dark:text-zinc-300">User's name</label>
-            <input 
-              id="nameQuery" 
+            <input
+              id="nameQuery"
               value={nameQuery}
               onChange={e => setNameQuery(e.target.value)}
-              placeholder="e.g. Rahul, Priya…" 
+              placeholder="e.g. Rahul, Priya…"
               className="px-3.5 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-give focus:ring-4 focus:ring-give/5 transition-all text-sm bg-gray-50 dark:bg-zinc-950/45 dark:text-white dark:placeholder:text-zinc-500"
             />
           </div>
         )}
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading}
           className="px-6 py-2.5 bg-give hover:brightness-110 text-white rounded-lg text-sm font-semibold shadow-lg shadow-give/10 transition-all disabled:opacity-50 shrink-0 h-[42px]"
         >
@@ -182,7 +180,7 @@ export default function BrowseUsers() {
             <UserCard key={u.id} user={u}
               action={
                 compat.compatible ? (
-                  <button 
+                  <button
                     className="px-3 py-1.5 bg-give hover:brightness-110 text-white rounded-md text-xs font-semibold shadow-md shadow-give/5 transition-all"
                     onClick={() => openRequest(u)}
                   >
@@ -215,8 +213,8 @@ export default function BrowseUsers() {
 
             <div className="flex flex-col gap-1.5 mb-4">
               <label htmlFor="reqSkill" className="text-xs font-semibold text-gray-600 dark:text-zinc-300">Skill you want to learn</label>
-              <input 
-                id="reqSkill" 
+              <input
+                id="reqSkill"
                 value={requestSkill}
                 onChange={e => setRequestSkill(e.target.value)}
                 placeholder="Which skill specifically?"
@@ -231,15 +229,14 @@ export default function BrowseUsers() {
                 return (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {chipSkills.map(name => (
-                      <button 
-                        key={name} 
+                      <button
+                        key={name}
                         type="button"
                         onClick={() => setRequestSkill(name)}
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                          requestSkill === name 
-                            ? 'border-give bg-give-bg text-give' 
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${requestSkill === name
+                            ? 'border-give bg-give-bg text-give'
                             : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                        }`}
+                          }`}
                       >
                         {name}
                       </button>
@@ -251,9 +248,9 @@ export default function BrowseUsers() {
 
             <div className="flex flex-col gap-1.5 mb-4">
               <label htmlFor="comment" className="text-xs font-semibold text-gray-600 dark:text-zinc-300">Message (optional)</label>
-              <textarea 
-                id="comment" 
-                rows={3} 
+              <textarea
+                id="comment"
+                rows={3}
                 value={comment}
                 onChange={e => setComment(e.target.value)}
                 placeholder="Tell them what you'd like to learn…"
@@ -274,15 +271,15 @@ export default function BrowseUsers() {
             ) : null}
 
             <div className="flex items-center justify-end gap-3 mt-6">
-              <button 
-                className="px-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md text-xs font-semibold transition-all" 
+              <button
+                className="px-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md text-xs font-semibold transition-all"
                 onClick={() => setRequestTarget(null)}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 className="px-4 py-2 bg-give hover:brightness-110 text-white rounded-md text-xs font-semibold shadow-md shadow-give/5 transition-all disabled:opacity-50"
-                onClick={sendRequest} 
+                onClick={sendRequest}
                 disabled={sending}
               >
                 {sending ? 'Sending…' : 'Send request'}

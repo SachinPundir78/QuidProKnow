@@ -23,6 +23,22 @@ A peer-to-peer skill-exchange platform. List skills you can teach and skills you
 
 ---
 
+## Screenshots
+
+![Screenshot 1](./frontend/src/public/S1.png)
+
+![Screenshot 2](./frontend/src/public/S2.png)
+
+![Screenshot 3](./frontend/src/public/S3.png)
+
+![Screenshot 4](./frontend/src/public/S4.png)
+
+![Screenshot 5](./frontend/src/public/S5.png)
+
+![Screenshot 6](./frontend/src/public/S6.png)
+
+---
+
 ## Tech Stack
 
 **Backend**
@@ -45,6 +61,131 @@ A peer-to-peer skill-exchange platform. List skills you can teach and skills you
 **AI**
 - Groq API — `llama-3.3-70b-versatile`
 - Gemini API (Optional alternative)
+
+---
+
+## System Design
+
+### High Level Design (HLD)
+
+QuidProKnow is built with a modern client-server architecture, decoupling the React presentation layer from the Spring Boot business logic layer.
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer"]
+        React["React 18 SPA (Vite)"]
+    end
+
+    subgraph Auth ["Authentication"]
+        Clerk["Clerk Auth (OAuth2 / IdP)"]
+    end
+
+    subgraph Backend ["Application Layer (Spring Boot 3.2)"]
+        Security["Spring Security (OAuth2 JWT)"]
+        Controllers["REST API Controllers"]
+        WS["WebSocket Service (STOMP)"]
+        Scheduler["Reminder Scheduler"]
+    end
+
+    subgraph Services ["Data & External Services"]
+        DB[(PostgreSQL - Neon)]
+        Cloudinary["Cloudinary (Images)"]
+        AI["Groq / Gemini LLM"]
+        Email["Gmail SMTP / Resend"]
+    end
+
+    React -->|Authenticate| Clerk
+    React -->|HTTPS REST with JWT| Security
+    React -->|WSS STOMP| WS
+    Security -->|Verify Signature| Clerk
+    Security --> Controllers
+    Controllers --> DB
+    Controllers --> Cloudinary
+    Controllers --> AI
+    Controllers --> Email
+    WS --> DB
+    Scheduler --> DB
+    Scheduler --> Email
+```
+
+#### Key Architecture Principles:
+- **Stateless Authentication**: Spring Security acts as an OAuth2 Resource Server, verifying Clerk-issued JWTs against Clerk's JWKS public keys without storing passwords locally.
+- **Real-Time Communication**: Persistent full-duplex STOMP over WebSocket channels for 1-on-1 instant messaging, read receipts, and online presence.
+- **Background Scheduling**: Spring `@Scheduled` task loop running every 60 seconds to evaluate session start times and send Google Calendar integration & reminder emails.
+- **AI Integration**: Profile analysis utilizing Groq (`llama-3.3-70b-versatile`) or Gemini with 24-hour database caching to eliminate redundant LLM calls.
+
+---
+
+### Low Level Design (LLD)
+
+#### 1. Entity-Relationship & Database Schema (PostgreSQL)
+
+```mermaid
+erDiagram
+    USERS ||--o{ SESSIONS : "requests / hosts"
+    USERS ||--o{ SKILL_REQUESTS : "sends / receives"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    CHAT_ROOMS ||--o{ MESSAGES : "contains"
+    SKILL_REQUESTS ||--|| CHAT_ROOMS : "spawns"
+
+    USERS {
+        bigint id PK
+        string clerk_id UK
+        string name
+        string email
+        string user_type "LEARNER | BARTER_USER"
+        int points
+        string profile_photo_url
+        timestamp created_at
+    }
+
+    SESSIONS {
+        bigint id PK
+        bigint user1_id FK
+        bigint user2_id FK
+        bigint host_user_id FK
+        string scheduled_time
+        string status "SCHEDULED | ONGOING | COMPLETED | CANCELLED"
+        string meeting_link
+        boolean reminder30_sent
+        boolean reminder10_sent
+    }
+
+    SKILL_REQUESTS {
+        bigint id PK
+        bigint sender_id FK
+        bigint receiver_id FK
+        string skill_wanted
+        string status "PENDING | ACCEPTED | REJECTED"
+        boolean one_way
+    }
+
+    MESSAGES {
+        bigint id PK
+        bigint room_id FK
+        bigint sender_id FK
+        text content
+        timestamp timestamp
+        boolean is_read
+    }
+```
+
+#### 2. Backend Class Architecture (Spring Boot)
+- **Security**: `SecurityConfig` enforces OAuth2 JWT resource server validation and CORS rules.
+- **Controllers**:
+  - `AuthController`: Handles `/api/auth/sync` to persist Clerk user metadata in PostgreSQL.
+  - `SkillRequestController`: Handles `/api/requests/**` for creation, acceptance, and rejection of skill exchanges.
+  - `SessionController`: Manages session scheduling, updates, and ratings.
+  - `ChatController` & `WebSocketConfig`: Handles HTTP message history and real-time STOMP messaging via `/ws`.
+- **Services**:
+  - `SkillRequestService`: Enforces skill compatibility matching, point deductions for `LEARNER` accounts, and triggers `EmailService` on accept.
+  - `EmailService`: Formats and dispatches HTML emails with Google Calendar pre-filled event links (`https://calendar.google.com/calendar/render?action=TEMPLATE...`).
+  - `ReminderScheduler`: Periodically checks sessions and dispatches 30-min email and in-app alerts.
+
+#### 3. Frontend Architecture (React)
+- **`ThemeContext`**: Global theme state manager (defaults to Dark Mode, persists to `localStorage`).
+- **`AuthContext`**: Wraps Clerk provider and syncs user state with backend `/api/auth/sync`.
+- **`axiosClient`**: Interceptor attaching Clerk Bearer token to all outgoing REST calls.
 
 ---
 

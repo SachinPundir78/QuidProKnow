@@ -1,7 +1,7 @@
 package com.skillify.chat.config;
 
 import com.skillify.security.CustomUserDetailsService;
-import com.skillify.security.JwtUtil;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
-    private final JwtUtil jwtUtil;
+    private final JwtDecoder jwtDecoder;
     private final CustomUserDetailsService userDetailsService;
 
     @Override
@@ -44,18 +44,15 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
             String token = authHeader.substring(7);
             try {
-                String email = jwtUtil.extractEmail(token);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                org.springframework.security.oauth2.jwt.Jwt jwt = jwtDecoder.decode(token);
+                String clerkId = jwt.getSubject();
+                UserDetails userDetails = userDetailsService.loadUserByClerkId(clerkId);
 
-                if (jwtUtil.isTokenValid(token, email)) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
-                    accessor.setUser(auth);
-                    log.debug("WebSocket authenticated: {}", email);
-                } else {
-                    throw new IllegalArgumentException("Invalid or expired JWT token.");
-                }
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails, jwt, userDetails.getAuthorities());
+                accessor.setUser(auth);
+                log.debug("WebSocket authenticated: {}", clerkId);
             } catch (Exception e) {
                 throw new IllegalArgumentException("WebSocket auth failed: " + e.getMessage());
             }

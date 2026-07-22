@@ -39,10 +39,10 @@ function SessionCard({ session, user, compact = false }) {
 
   return (
     <article className={`rounded-xl border border-gray-200 bg-gray-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/70 ${compact ? '' : 'transition hover:border-orange-200 dark:hover:border-orange-500/30'}`}>
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 font-display">
         <div className="min-w-0">
-          <p className="mb-1 truncate text-sm font-bold text-gray-900 dark:text-white">{sessionName(session)}</p>
-          <p className="mb-3 text-xs text-gray-500 dark:text-zinc-400">with {counterpart || 'your learning partner'}</p>
+          <h3 className="mb-1 truncate text-sm font-semibold text-gray-900 dark:text-white">{sessionName(session)}</h3>
+          <p className="mb-3 text-sm text-gray-500 dark:text-zinc-400">with {counterpart || 'your learning partner'}</p>
           {date && (
             <p className="mb-0 flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 dark:text-zinc-400">
               <Clock3 className="h-3.5 w-3.5 text-orange-500" />
@@ -61,7 +61,7 @@ function SessionCard({ session, user, compact = false }) {
           href={session.meetingLink}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gray-950 px-3 py-2 text-xs font-bold text-white transition hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-gray-950 px-3 py-2 text-sm font-bold font-sach !text-white transition hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
         >
           <Video className="h-3.5 w-3.5" />
           Join meeting

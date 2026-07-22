@@ -5,13 +5,12 @@ import com.skillify.entity.*;
 import com.skillify.exception.ApiException;
 import com.skillify.repository.UserRepository;
 import com.skillify.repository.UserSkillRepository;
-import com.skillify.security.JwtUtil;
 import com.skillify.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,27 +21,38 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final UserSkillRepository userSkillRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
     private final NotificationService notificationService;
 
     @Transactional
-    public AuthResponse register(RegisterRequest req) {
+    public UserDTO syncClerkUser(RegisterRequest req, String clerkId) {
+        
+        // If user already exists, just return their profile
+        var existingUser = userRepository.findByClerkId(clerkId);
+        if (existingUser.isPresent()) {
+            return UserDTO.from(existingUser.get());
+        }
+        
+        // Check if email already used by a non-clerk legacy account
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new ApiException("An account with this email already exists.", HttpStatus.CONFLICT);
+            // We could merge them, but for simplicity we throw an exception or update the clerkId.
+            // Let's just update the clerkId of the existing legacy account to seamlessly migrate them!
+            User legacyUser = userRepository.findByEmail(req.getEmail()).get();
+            legacyUser.setClerkId(clerkId);
+            userRepository.save(legacyUser);
+            return UserDTO.from(legacyUser);
         }
 
         UserType userType = UserType.valueOf(req.getUserType());
-
         if (userType == UserType.BARTER_USER &&
                 (req.getSkillsOffered() == null || req.getSkillsOffered().isEmpty())) {
             throw new ApiException("Barter users must specify at least one skill they offer.", HttpStatus.BAD_REQUEST);
         }
 
         User user = User.builder()
+                .clerkId(clerkId)
                 .name(req.getName())
                 .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))
+                .password("clerk-managed-account") // Added to bypass DB constraint
                 .age(req.getAge())
                 .bio(req.getBio())
                 .userType(userType)
@@ -50,37 +60,20 @@ public class AuthService {
                 .totalRatingSum(0)
                 .totalRatings(0)
                 .badge("NONE")
+                .onboarded(false)
                 .skills(new ArrayList<>())
                 .build();
 
         user = userRepository.save(user);
 
-        // Persist skills
         addSkillsToUser(user, req.getSkillsWanted(), SkillType.WANT);
         if (req.getSkillsOffered() != null) {
             addSkillsToUser(user, req.getSkillsOffered(), SkillType.OFFER);
         }
+        
+        notificationService.notify(user, "Welcome to QuidProKnow! You have received " + user.getPoints() + " points.");
 
-        String token = jwtUtil.generateToken(new UserPrincipal(user));
-        return new AuthResponse(token, UserDTO.from(user));
-    }
-
-    @Transactional
-    public AuthResponse login(LoginRequest req) {
-        User user = userRepository.findByEmail(req.getEmail())
-                .orElseThrow(() -> new ApiException("Invalid email or password.", HttpStatus.UNAUTHORIZED));
-
-        if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
-            throw new ApiException("Invalid email or password.", HttpStatus.UNAUTHORIZED);
-        }
-
-        String token = jwtUtil.generateToken(new UserPrincipal(user));
-
-        notificationService.notify(user,
-                "Welcome back, " + user.getName() + "! Points: " + user.getPoints() +
-                " | Role: " + user.getUserType());
-
-        return new AuthResponse(token, UserDTO.from(user));
+        return UserDTO.from(user);
     }
 
     private void addSkillsToUser(User user, List<String> skillNames, SkillType type) {
@@ -98,5 +91,33 @@ public class AuthService {
                 user.getSkills().add(skill);
             }
         }
+    }
+
+    @Transactional
+    public UserDTO onboardUser(OnboardingRequest req, String clerkId) {
+        User user = userRepository.findByClerkId(clerkId)
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+
+        UserType userType = UserType.valueOf(req.getUserType());
+        if (userType == UserType.BARTER_USER &&
+                (req.getSkillsOffered() == null || req.getSkillsOffered().isEmpty())) {
+            throw new ApiException("Barter users must specify at least one skill they offer.", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setUserType(userType);
+        user.setAge(req.getAge());
+        user.setBio(req.getBio());
+        user.setPoints(userType == UserType.LEARNER ? 100 : 50);
+        user.setOnboarded(true);
+
+        // Clear existing skills and add new ones
+        user.getSkills().clear();
+        addSkillsToUser(user, req.getSkillsWanted(), SkillType.WANT);
+        if (req.getSkillsOffered() != null) {
+            addSkillsToUser(user, req.getSkillsOffered(), SkillType.OFFER);
+        }
+
+        user = userRepository.save(user);
+        return UserDTO.from(user);
     }
 }

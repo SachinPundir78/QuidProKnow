@@ -31,18 +31,21 @@ public class SkillRequestService {
     private final NotificationService notificationService;
     private final ChatService chatService;
     private final MeetingLinkValidator meetingLinkValidator;
+    private final EmailService emailService;
 
     public SkillRequestService(SkillRequestRepository requestRepository,
                                 MeetingLinkValidator meetingLinkValidator,
                                 SessionRepository sessionRepository,
                                 UserRepository userRepository,
                                 NotificationService notificationService,
+                                EmailService emailService,
                                 @Lazy ChatService chatService) {
         this.meetingLinkValidator   = meetingLinkValidator;
         this.requestRepository   = requestRepository;
         this.sessionRepository   = sessionRepository;
         this.userRepository      = userRepository;
         this.notificationService = notificationService;
+        this.emailService        = emailService;
         this.chatService         = chatService;
     }
 
@@ -219,6 +222,10 @@ public class SkillRequestService {
                 "Your session was accepted! A chat room is now open — go to Chat to connect with " + currentUser.getName() + ".");
         notificationService.notify(currentUser,
                 "A chat room with " + sender.getName() + " has been created. Go to Chat to connect!");
+        // ──────────────────────────────────────────────────────────────────
+
+        // ── Send Email with Google Calendar Link ──────────────────────────
+        emailService.sendSessionAcceptedEmail(sender, session, currentUser);
         // ──────────────────────────────────────────────────────────────────
 
         return SkillRequestDTO.from(req);

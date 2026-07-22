@@ -5,6 +5,7 @@ import com.skillify.entity.SessionStatus;
 import com.skillify.repository.NotificationRepository;
 import com.skillify.repository.SessionRepository;
 import com.skillify.service.NotificationService;
+import com.skillify.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,6 +33,7 @@ public class ReminderScheduler {
 
     private final SessionRepository sessionRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Scheduled(fixedRate = 60_000)
     @Transactional
@@ -62,6 +64,11 @@ public class ReminderScheduler {
             String msg = "⏰ Reminder: Your session \"" + skill + "\" starts in 30 minutes!" + link;
             notificationService.notify(session.getUser1(), msg);
             notificationService.notify(session.getUser2(), msg);
+            
+            // Send Email Reminders
+            emailService.sendSessionReminderEmail(session.getUser1(), session, 30);
+            emailService.sendSessionReminderEmail(session.getUser2(), session, 30);
+            
             session.setReminder30Sent(true);
             sessionRepository.save(session);
         }

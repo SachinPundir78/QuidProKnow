@@ -101,10 +101,10 @@ export default function Dashboard() {
 
   // Badge thresholds
   const getBadgeProgress = (points) => {
-    if (points < 100) return { current: points, target: 100, next: 'Explorer', badge: 'Learner' };
-    if (points < 300) return { current: points, target: 300, next: 'Collaborator', badge: 'Explorer' };
-    if (points < 600) return { current: points, target: 600, next: 'Mentor', badge: 'Collaborator' };
-    return { current: points, target: 1000, next: 'Legend', badge: 'Mentor' };
+    if (points < 100) return { current: points, target: 100, next: 'Explorer', badge: 'Learner', level: 1 };
+    if (points < 300) return { current: points, target: 300, next: 'Collaborator', badge: 'Explorer', level: 2 };
+    if (points < 600) return { current: points, target: 600, next: 'Mentor', badge: 'Collaborator', level: 3 };
+    return { current: points, target: 1000, next: 'Legend', badge: 'Mentor', level: 4 };
   };
 
   const progressInfo = getBadgeProgress(user.points || 0);
@@ -370,13 +370,14 @@ export default function Dashboard() {
                           >
                             {u.name}
                           </Link>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-xs font-semibold text-gray-800 dark:text-zinc-300">
-                              {u.averageRating > 0 ? u.averageRating.toFixed(1) : '4.8'}
+                          {/* Rating */}
+                          <div className="flex items-center gap-1 mt-1 shrink-0">
+                            <span className="text-[10px] font-bold font-sach text-gray-900 dark:text-white">
+                              {u.totalRatings > 0 ? u.averageRating.toFixed(1) : '0.0'}
                             </span>
                             {renderStars(u.averageRating)}
-                            <span className="text-[10px] text-gray-400 dark:text-zinc-500">
-                              ({u.totalRatings || 120})
+                            <span className="text-[10px] font-sach text-gray-400 dark:text-zinc-500 font-medium">
+                              ({u.totalRatings || 0})
                             </span>
                           </div>
                         </div>
@@ -396,8 +397,8 @@ export default function Dashboard() {
 
                       {/* Sessions count */}
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-bold text-gray-900 dark:text-zinc-300 block">
-                          {u.points + 15} sessions
+                        <span className="text-[13px] font-bold font-sach text-black dark:text-white">
+                          {u.sessionsCompleted || 0} sessions
                         </span>
                       </div>
                     </div>
@@ -579,7 +580,7 @@ export default function Dashboard() {
                       {progressInfo.badge}
                     </h3>
                     <p className="text-[10px] text-gray-400 dark:text-zinc-500 font-semibold uppercase tracking-wider">
-                      Level 3
+                      Level {progressInfo.level}
                     </p>
                   </div>
                   <span className="text-sm font-bold text-black font-display dark:text-white">
