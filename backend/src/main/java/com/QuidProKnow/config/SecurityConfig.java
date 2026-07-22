@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
-    @Value("${app.cors.allowed-origins}")
+    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000,https://quidproknow.vercel.app}")
     private String allowedOrigins;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:https://close-asp-5.clerk.accounts.dev}")
