@@ -22,7 +22,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.mail.from:noreply@quidproknow.com}")
+    @Value("${app.mail.from:sachinpundir0078@gmail.com}")
     private String fromEmail;
 
     public void sendSessionAcceptedEmail(User recipient, Session session, User provider) {

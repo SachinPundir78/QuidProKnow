@@ -15,10 +15,10 @@ import org.springframework.util.StringUtils;
 public class ContactService {
     private final JavaMailSender mailSender;
 
-    @Value("${app.mail.from}")
+    @Value("${app.mail.from:sachinpundir0078@gmail.com}")
     private String fromEmail;
 
-    @Value("${app.contact.recipient}")
+    @Value("${app.contact.recipient:sachinpundir0078@gmail.com}")
     private String recipientEmail;
 
     public void send(ContactMessageRequest request) {
